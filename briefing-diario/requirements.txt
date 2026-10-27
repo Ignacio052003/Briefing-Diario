@@ -1,0 +1,5 @@
+anthropic>=0.60
+feedparser>=6.0
+yfinance>=0.2.50
+edge-tts>=7.0
+openai>=1.60
