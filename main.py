@@ -35,8 +35,10 @@ def main() -> None:
     site.mkdir(parents=True, exist_ok=True)
 
     if args.demo:
-        guion = ("Buenos días. Esto es una prueba del briefing. Los mercados abren con calma.\n"
-                 "Fin de la prueba.")
+        from briefing.guion import fecha_corta
+        guion = {"saludo": config.SALUDO.format(fecha=fecha_corta(ahora)),
+                 "cuerpo": "Esto es una prueba del briefing. Los mercados abren con calma.",
+                 "cierre": "¡Aquí tienes tu resumen! ¡Y al ataque!"}
     else:
         from briefing.fuentes import recoger_mercados, recoger_noticias
         from briefing.guion import escribir_guion
@@ -45,8 +47,9 @@ def main() -> None:
         print("Redactando el guion con Claude…")
         guion = escribir_guion(ahora, noticias, mercados)
 
+    texto = "\n\n".join([guion["saludo"], guion["cuerpo"], guion["cierre"]])
     if args.solo_guion:
-        print("\n" + guion)
+        print("\n" + texto)
         return
 
     mp3 = site / f"briefing-{ahora:%Y-%m-%d}.mp3"
@@ -59,11 +62,11 @@ def main() -> None:
         locutar(guion, mp3)
 
     from briefing.voz import duracion_segundos
-    duracion = duracion_segundos(mp3)
-    mp3.with_suffix(".txt").write_text(guion, encoding="utf-8")
+    duracion = int(duracion_segundos(mp3))
+    mp3.with_suffix(".txt").write_text(texto, encoding="utf-8")
 
-    frases = re.split(r"(?<=[.!?])\s+", guion.replace("\n", " "))
-    descripcion = " ".join(frases[1:4])[:600] or guion[:600]
+    frases = re.split(r"(?<=[.!?])\s+", guion["cuerpo"].replace("\n", " "))
+    descripcion = " ".join(frases[:3])[:600]
     titulo = f"Briefing del {fecha_larga(ahora)}"
     episodios = feed.añadir_episodio(site, feed.datos_episodio(ahora, mp3, duracion, titulo, descripcion))
 

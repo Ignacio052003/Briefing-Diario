@@ -12,15 +12,27 @@ ZONA_HORARIA = "Europe/Madrid"
 
 # --- Modelo de IA (Claude) --------------------------------------------------
 MODELO_IA = "claude-sonnet-5-5"     # "claude-opus-5-5" = mejor y algo más caro
-MAX_BUSQUEDAS_WEB = 8               # búsquedas que puede hacer para completar datos
-PALABRAS_OBJETIVO = (1800, 2300)    # ~12-15 minutos de audio
+MAX_BUSQUEDAS_WEB = 5               # búsquedas que puede hacer para completar datos (cada una suma coste)
+PALABRAS_OBJETIVO = (1200, 1350)    # cuerpo de ~7 minutos a +20 %; con saludo, cierre y música, ~8 min
 
 # --- Voz ----------------------------------------------------------------------
 # "edge"   -> gratis, voces neuronales de Microsoft (no necesita cuenta)
 # "openai" -> más natural, ~0,15 € por episodio (necesita OPENAI_API_KEY)
 MOTOR_VOZ = "edge"
 VOZ_EDGE = "es-ES-AlvaroNeural"     # alternativa femenina: "es-ES-ElviraNeural"
-VELOCIDAD_EDGE = "+8%"
+VELOCIDAD_EDGE = "+20%"            # velocidad del cuerpo
+VELOCIDAD_EDGE_SALUDO = "+24%"     # saludo y cierre, algo más rápidos
+TONO_EDGE_SALUDO = "+6Hz"          # y un poco más agudos, para darles energía
+
+# Saludo fijo (la fecha se rellena sola)
+SALUDO = "¡Buenos días! Hoy es {fecha}. ¡Y este es tu podcast personalizado diario, para que estés al día de todo!"
+
+# --- Música -------------------------------------------------------------------
+MUSICA = "assets/musica.mp3"       # si no existe el archivo, el episodio va sin música
+MUSICA_ENTRADA_SEG = 4.0           # segundos de música sola antes del saludo
+MUSICA_SALIDA_SEG = 5.0            # segundos de música sola tras la despedida
+MUSICA_VOLUMEN = 0.28              # volumen de la música cuando suena sola
+MUSICA_VOLUMEN_FONDO = 0.07        # volumen de la música por debajo de la voz
 VOZ_OPENAI = "ash"
 INSTRUCCIONES_VOZ_OPENAI = (
     "Habla en español de España, con acento castellano neutro. "
@@ -72,27 +84,24 @@ FUENTES = {
         ("El Confidencial Empresas", "https://rss.elconfidencial.com/empresas/"),
     ],
 }
-NOTICIAS_POR_FUENTE = 12
+NOTICIAS_POR_FUENTE = 7
 HORAS_ATRAS = 30          # los lunes se amplía a 78 h para cubrir el fin de semana
 
 # --- Datos de mercado (Yahoo Finance) ----------------------------------------
 # (nombre que se leerá, ticker, tipo)  tipo: "indice", "rentabilidad", "divisa", "materia"
 MERCADOS = [
-    ("S&P 500", "^GSPC", "indice"),
-    ("Nasdaq 100", "^NDX", "indice"),
-    ("Dow Jones", "^DJI", "indice"),
-    ("MSCI World (vía ETF URTH)", "URTH", "indice"),
-    ("Euro Stoxx 50", "^STOXX50E", "indice"),
-    ("DAX", "^GDAXI", "indice"),
+    # Los que se comentan siempre
     ("IBEX 35", "^IBEX", "indice"),
-    ("Nikkei 225", "^N225", "indice"),
-    ("Hang Seng", "^HSI", "indice"),
-    ("Futuro S&P 500", "ES=F", "indice"),
-    ("VIX", "^VIX", "indice"),
-    ("Bono EE.UU. 10 años (rentabilidad)", "^TNX", "rentabilidad"),
-    ("Bono EE.UU. 30 años (rentabilidad)", "^TYX", "rentabilidad"),
+    ("S&P 500", "^GSPC", "indice"),
+    ("MSCI World (vía ETF URTH)", "URTH", "indice"),
     ("EUR/USD", "EURUSD=X", "divisa"),
-    ("Brent", "BZ=F", "materia"),
     ("Oro", "GC=F", "materia"),
     ("Bitcoin", "BTC-USD", "materia"),
+    # De contexto: solo se comentan si son noticia
+    ("Euro Stoxx 50", "^STOXX50E", "indice"),
+    ("Nasdaq 100", "^NDX", "indice"),
+    ("Futuro S&P 500", "ES=F", "indice"),
+    ("Nikkei 225", "^N225", "indice"),
+    ("Bono EE.UU. 10 años (rentabilidad)", "^TNX", "rentabilidad"),
+    ("Brent", "BZ=F", "materia"),
 ]

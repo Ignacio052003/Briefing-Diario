@@ -15,15 +15,25 @@ def fecha_larga(d) -> str:
     return f"{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]} de {d.year}"
 
 
-def escribir_guion(ahora, noticias: str, mercados: str) -> str:
+def fecha_corta(d) -> str:
+    return f"{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]}"
+
+
+def _etiqueta(texto: str, nombre: str) -> str:
+    m = re.search(rf"<{nombre}>(.*?)</{nombre}>", texto, re.S)
+    return m.group(1).strip() if m else ""
+
+
+def escribir_guion(ahora, noticias: str, mercados: str) -> dict:
+    """Devuelve {"saludo", "cuerpo", "cierre"} listos para locutar."""
     plantilla = (Path(__file__).parent.parent / "prompts" / "guion.md").read_text(encoding="utf-8")
     sistema = plantilla.replace("{palabras_min}", str(config.PALABRAS_OBJETIVO[0])) \
                        .replace("{palabras_max}", str(config.PALABRAS_OBJETIVO[1]))
 
-    nota_lunes = ("\nHoy es lunes: incluye lo relevante ocurrido durante el fin de semana "
-                  "y los cierres de mercado son los del viernes.\n") if ahora.weekday() == 0 else ""
+    nota_lunes = ("\nHoy es lunes: incluye lo relevante del fin de semana; "
+                  "los cierres de mercado son los del viernes.\n") if ahora.weekday() == 0 else ""
 
-    peticion = f"""Hoy es {fecha_larga(ahora)}; son las {ahora:%H:%M} en Madrid.{nota_lunes}
+    peticion = f"""Hoy es {fecha_larga(ahora)}; son las {ahora:%H:%M} en Madrid y el oyente lo escuchará hacia las 7:00.{nota_lunes}
 
 ## Datos de mercado (Yahoo Finance)
 {mercados}
@@ -31,9 +41,8 @@ def escribir_guion(ahora, noticias: str, mercados: str) -> str:
 ## Titulares recientes de las fuentes
 {noticias}
 
-Prepara el briefing de hoy siguiendo tus instrucciones. Usa la búsqueda web para completar
-lo que falte (Bund, bono español y prima de riesgo, Asia esta mañana, agenda del día) y para
-ampliar las 3-5 noticias más importantes."""
+Elige las historias, usa la búsqueda web solo para ampliar las que vayas a contar y para la agenda de hoy,
+y escribe el cuerpo y el cierre siguiendo tus instrucciones."""
 
     cliente = anthropic.Anthropic()
     herramientas = [{
@@ -47,7 +56,7 @@ ampliar las 3-5 noticias más importantes."""
 
     for _ in range(6):  # la API puede pausar turnos largos de búsqueda
         resp = cliente.messages.create(
-            model=config.MODELO_IA, max_tokens=12000, system=sistema,
+            model=config.MODELO_IA, max_tokens=8000, system=sistema,
             messages=mensajes, tools=herramientas,
         )
         if resp.stop_reason != "pause_turn":
@@ -55,9 +64,15 @@ ampliar las 3-5 noticias más importantes."""
         mensajes.append({"role": "assistant", "content": resp.content})
 
     texto = "".join(b.text for b in resp.content if b.type == "text")
-    m = re.search(r"<guion>(.*?)</guion>", texto, re.S)
-    guion = (m.group(1) if m else texto).strip()
-    if len(guion.split()) < 300:
-        raise RuntimeError(f"Guion demasiado corto ({len(guion.split())} palabras). Respuesta:\n{texto[:2000]}")
-    print(f"Guion: {len(guion.split())} palabras. Tokens: {resp.usage.input_tokens} in / {resp.usage.output_tokens} out")
-    return guion
+    cuerpo = _etiqueta(texto, "cuerpo")
+    cierre = _etiqueta(texto, "cierre") or "¡Aquí tienes tu resumen! Mucho ánimo con el día. ¡Y al ataque!"
+    if len(cuerpo.split()) < 300:
+        raise RuntimeError(f"Guion demasiado corto ({len(cuerpo.split())} palabras). Respuesta:\n{texto[:2000]}")
+
+    print(f"Guion: {len(cuerpo.split())} palabras. Tokens: {resp.usage.input_tokens} in / "
+          f"{resp.usage.output_tokens} out")
+    return {
+        "saludo": config.SALUDO.format(fecha=fecha_corta(ahora)),
+        "cuerpo": cuerpo,
+        "cierre": cierre,
+    }
