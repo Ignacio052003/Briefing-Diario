@@ -9,6 +9,7 @@ import config
 DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
 MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+CIERRE_POR_DEFECTO = "¡Aquí tienes tu resumen! Mucho ánimo con el día. ¡Y al ataque!"
 
 
 def fecha_larga(d) -> str:
@@ -19,9 +20,14 @@ def fecha_corta(d) -> str:
     return f"{DIAS[d.weekday()]} {d.day} de {MESES[d.month - 1]}"
 
 
-def _etiqueta(texto: str, nombre: str) -> str:
-    m = re.search(rf"<{nombre}>(.*?)</{nombre}>", texto, re.S)
-    return m.group(1).strip() if m else ""
+def separar(texto: str) -> tuple[str, str]:
+    """Saca el cuerpo y el cierre, aunque falte alguna etiqueta de cierre."""
+    cuerpo = re.search(r"<cuerpo>(.*?)(?:</cuerpo>|<cierre>|$)", texto, re.S)
+    cierre = re.search(r"<cierre>(.*?)(?:</cierre>|$)", texto, re.S)
+    cuerpo = cuerpo.group(1) if cuerpo else texto.split("<cierre>")[0]
+    cierre = cierre.group(1) if cierre else ""
+    limpiar = lambda t: re.sub(r"</?(cuerpo|cierre)>", "", t).strip()  # noqa: E731
+    return limpiar(cuerpo), limpiar(cierre) or CIERRE_POR_DEFECTO
 
 
 def escribir_guion(ahora, noticias: str, mercados: str) -> dict:
@@ -54,23 +60,28 @@ y escribe el cuerpo y el cierre siguiendo tus instrucciones."""
     }]
     mensajes = [{"role": "user", "content": peticion}]
 
-    for _ in range(6):  # la API puede pausar turnos largos de búsqueda
+    # La respuesta puede llegar en varias tandas (la API pausa los turnos largos de
+    # búsqueda): se junta el texto de todas.
+    textos, entrada, salida = [], 0, 0
+    for _ in range(6):
         resp = cliente.messages.create(
-            model=config.MODELO_IA, max_tokens=8000, system=sistema,
+            model=config.MODELO_IA, max_tokens=16000, system=sistema,
             messages=mensajes, tools=herramientas,
         )
+        textos.append("".join(b.text for b in resp.content if b.type == "text"))
+        entrada += resp.usage.input_tokens
+        salida += resp.usage.output_tokens
         if resp.stop_reason != "pause_turn":
             break
         mensajes.append({"role": "assistant", "content": resp.content})
 
-    texto = "".join(b.text for b in resp.content if b.type == "text")
-    cuerpo = _etiqueta(texto, "cuerpo")
-    cierre = _etiqueta(texto, "cierre") or "¡Aquí tienes tu resumen! Mucho ánimo con el día. ¡Y al ataque!"
+    texto = "".join(textos)
+    cuerpo, cierre = separar(texto)
+    print(f"Fin de la respuesta: {resp.stop_reason}. Guion: {len(cuerpo.split())} palabras. "
+          f"Tokens: {entrada} in / {salida} out")
     if len(cuerpo.split()) < 300:
         raise RuntimeError(f"Guion demasiado corto ({len(cuerpo.split())} palabras). Respuesta:\n{texto[:2000]}")
 
-    print(f"Guion: {len(cuerpo.split())} palabras. Tokens: {resp.usage.input_tokens} in / "
-          f"{resp.usage.output_tokens} out")
     return {
         "saludo": config.SALUDO.format(fecha=fecha_corta(ahora)),
         "cuerpo": cuerpo,
