@@ -24,14 +24,18 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Instalar dependencias
-        timeout-minutes: 8
+      - name: Instalar ffmpeg
+        timeout-minutes: 5
         run: |
-          if ! command -v ffmpeg >/dev/null; then
-            sudo apt-get update -qq -o Acquire::Retries=3
-            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends ffmpeg
-          fi
-          pip install -q -r requirements.txt
+          curl -sSL --retry 3 -o /tmp/ffmpeg.tar.xz https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-linux64-gpl.tar.xz
+          mkdir -p "$HOME/ffmpeg"
+          tar -xJf /tmp/ffmpeg.tar.xz -C "$HOME/ffmpeg" --strip-components=1
+          echo "$HOME/ffmpeg/bin" >> "$GITHUB_PATH"
+          "$HOME/ffmpeg/bin/ffmpeg" -version | head -1
+
+      - name: Instalar librerías de Python
+        timeout-minutes: 8
+        run: pip install -r requirements.txt
 
       - name: Recuperar episodios anteriores
         run: |
@@ -59,7 +63,5 @@ jobs:
           git config user.name "briefing-bot"
           git config user.email "briefing-bot@users.noreply.github.com"
           git add -A
-          git commit -q -m "Briefing $(date -u +%F)"
-          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
           git commit -q -m "Briefing $(date -u +%F)"
           git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
