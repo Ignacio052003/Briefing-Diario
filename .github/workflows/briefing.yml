@@ -40,7 +40,7 @@ jobs:
 
       - name: Generar briefing
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.API_CLAUDE }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           OWNER="${GITHUB_REPOSITORY_OWNER,,}"
