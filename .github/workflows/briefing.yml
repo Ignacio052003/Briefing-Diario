@@ -69,4 +69,13 @@ jobs:
           git config user.email "briefing-bot@users.noreply.github.com"
           git add -A
           git commit -q -m "Briefing $(date -u +%F)"
-          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
+          # Hasta 3 intentos; si falla, el motivo queda visible en el resumen de la ejecución
+          for intento in 1 2 3; do
+            if salida=$(git push --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages 2>&1); then
+              echo "Publicado al intento $intento"; exit 0
+            fi
+            echo "::warning::Intento $intento de publicar fallido: $(echo "$salida" | tr '\n' ' ' | cut -c1-500)"
+            sleep 10
+          done
+          echo "::error::No se ha podido publicar: $(echo "$salida" | tr '\n' ' ' | cut -c1-800)"
+          exit 1
