@@ -7,6 +7,9 @@ on:
         description: "Velocidad de lectura (por ejemplo +20%)"
         default: "+20%"
 
+permissions:
+  contents: write
+
 jobs:
   muestras:
     runs-on: ubuntu-24.04
@@ -18,7 +21,12 @@ jobs:
           python-version: "3.12"
       - run: pip install edge-tts
       - run: python herramientas/muestras_voz.py muestras "${{ inputs.velocidad }}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: muestras-voz
-          path: muestras/
+      - name: Guardar las muestras en la rama muestras-voz
+        run: |
+          cd muestras
+          git init -q -b muestras-voz
+          git config user.name "briefing-bot"
+          git config user.email "briefing-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Muestras de voz $(date -u +%F)"
+          git push -q --force "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" muestras-voz
