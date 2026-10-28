@@ -20,7 +20,7 @@ REVISION_EDITOR = True             # segunda pasada que recorta datos y hace el 
 # "edge"   -> gratis, voces neuronales de Microsoft (no necesita cuenta)
 # "openai" -> más natural, ~0,15 € por episodio (necesita OPENAI_API_KEY)
 MOTOR_VOZ = "edge"
-VOZ_EDGE = "es-ES-AlvaroNeural"     # alternativa femenina: "es-ES-ElviraNeural"
+VOZ_EDGE = "es-ES-XimenaNeural"     # alternativas: "es-ES-AlvaroNeural" (masculina), "es-ES-ElviraNeural"
 VELOCIDAD_EDGE = "+20%"            # velocidad del cuerpo
 VELOCIDAD_EDGE_SALUDO = "+24%"     # saludo y cierre, algo más rápidos
 TONO_EDGE_SALUDO = "+6Hz"          # y un poco más agudos, para darles energía
