@@ -63,7 +63,9 @@ def revisar(cliente, borrador: dict) -> dict:
                        .replace("{palabras_max}", str(config.PALABRAS_OBJETIVO[1]))
     try:
         resp = cliente.messages.create(
-            model=config.MODELO_IA, max_tokens=12000, system=sistema,
+            model=config.MODELO_IA, max_tokens=8000, system=sistema,
+            # Sin razonamiento previo: editar no lo necesita y se comería el espacio de respuesta
+            thinking={"type": "between_tools"},
             messages=[{"role": "user", "content": "Este es el guion de hoy:\n\n" + _a_texto(borrador)}],
         )
         bruto = "".join(b.text for b in resp.content if b.type == "text")
