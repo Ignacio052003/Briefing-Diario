@@ -11,6 +11,13 @@ MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
          "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 CIERRE_POR_DEFECTO = "¡Y hasta aquí tu resumen! Mucho ánimo con el día. ¡Y al ataque!"
 RAFAGA = re.compile(r"^\s*\[\s*R[ÁA]FAGA\s*\]\s*$", re.I | re.M)
+REGISTRO: list[str] = []  # diagnóstico de la última ejecución (se publica junto al episodio)
+BORRADOR: list[str] = []  # texto del guionista antes del editor (se publica para comparar)
+
+
+def _log(msg: str) -> None:
+    print(msg)
+    REGISTRO.append(msg)
 
 
 def fecha_larga(d) -> str:
@@ -56,19 +63,31 @@ def revisar(cliente, borrador: dict) -> dict:
                        .replace("{palabras_max}", str(config.PALABRAS_OBJETIVO[1]))
     try:
         resp = cliente.messages.create(
-            model=config.MODELO_IA, max_tokens=8000, system=sistema,
+            model=config.MODELO_IA, max_tokens=12000, system=sistema,
             messages=[{"role": "user", "content": "Este es el guion de hoy:\n\n" + _a_texto(borrador)}],
         )
-        revisado = separar("".join(b.text for b in resp.content if b.type == "text"))
+        bruto = "".join(b.text for b in resp.content if b.type == "text")
+        revisado = separar(bruto)
     except Exception as e:  # noqa: BLE001
-        print(f"La revisión del editor ha fallado ({e}); se usa el borrador.")
+        _log(f"La revisión del editor ha fallado ({e}); se usa el borrador.")
         return borrador
     antes, despues = _palabras(borrador), _palabras(revisado)
-    print(f"Editor: {antes} → {despues} palabras, {len(revisado['secciones'])} secciones. "
-          f"Tokens: {resp.usage.input_tokens} in / {resp.usage.output_tokens} out")
-    if (len(revisado["secciones"]) < max(3, len(borrador["secciones"]) - 1)
-            or despues < 0.55 * antes or not revisado["sumario"]):
-        print("La versión del editor no pasa los controles; se usa el borrador.")
+    _log(f"Editor: fin={resp.stop_reason}, {antes} → {despues} palabras, "
+         f"{len(borrador['secciones'])} → {len(revisado['secciones'])} secciones. "
+         f"Tokens: {resp.usage.input_tokens} in / {resp.usage.output_tokens} out")
+    problemas = []
+    if resp.stop_reason != "end_turn":
+        problemas.append(f"respuesta incompleta ({resp.stop_reason})")
+    if "</cuerpo>" not in bruto or "</cierre>" not in bruto:
+        problemas.append("faltan etiquetas de cierre")
+    if len(revisado["secciones"]) < len(borrador["secciones"]) - 1 or len(revisado["secciones"]) < 3:
+        problemas.append("faltan secciones")
+    if despues < 0.65 * antes:
+        problemas.append("ha recortado demasiado")
+    if not revisado["sumario"]:
+        problemas.append("sin sumario")
+    if problemas:
+        _log("La versión del editor no pasa los controles (" + "; ".join(problemas) + "); se usa el borrador.")
         return borrador
     return revisado
 
@@ -119,10 +138,13 @@ y escribe el sumario, el cuerpo y el cierre siguiendo tus instrucciones."""
         mensajes.append({"role": "assistant", "content": resp.content})
 
     texto = "".join(textos)
+    BORRADOR.append(texto)
+    if "</cierre>" not in texto:
+        _log("Aviso: la respuesta del guionista no trae la etiqueta </cierre> (¿texto incompleto?).")
     guion = separar(texto)
     palabras = _palabras(guion)
-    print(f"Fin de la respuesta: {resp.stop_reason}. Borrador: {palabras} palabras, "
-          f"{len(guion['secciones'])} secciones. Tokens: {entrada} in / {salida} out")
+    _log(f"Guionista: fin={resp.stop_reason}, {palabras} palabras, "
+         f"{len(guion['secciones'])} secciones. Tokens: {entrada} in / {salida} out")
     if palabras < 300:
         raise RuntimeError(f"Guion demasiado corto ({palabras} palabras). Respuesta:\n{texto[:2000]}")
 

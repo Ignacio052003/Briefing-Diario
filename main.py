@@ -72,6 +72,12 @@ def main() -> None:
 
     from briefing.voz import duracion_segundos
     duracion = int(duracion_segundos(mp3))
+    if not args.demo:
+        from briefing.guion import BORRADOR, REGISTRO
+        (site / "borrador.txt").write_text("\n\n".join(BORRADOR), encoding="utf-8")
+        (site / "registro.txt").write_text(
+            f"{ahora:%Y-%m-%d %H:%M} · {mp3.name} · {duracion // 60} min {duracion % 60} s\n"
+            + "\n".join(REGISTRO) + "\n", encoding="utf-8")
     mp3.with_suffix(".txt").write_text(texto, encoding="utf-8")
 
     descripcion = guion["sumario"][:600] or " ".join(
