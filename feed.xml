@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Mi Briefing Diario</title>
+    <link>https://ignacio052003.github.io/Briefing-Diario/</link>
+    <atom:link href="https://ignacio052003.github.io/Briefing-Diario/feed.xml" rel="self" type="application/rss+xml"/>
+    <language>es-es</language>
+    <description>Resumen diario personalizado de actualidad, mercados y economía.</description>
+    <itunes:author>Briefing personal</itunes:author>
+    <itunes:summary>Resumen diario personalizado de actualidad, mercados y economía.</itunes:summary>
+    <itunes:image href="https://ignacio052003.github.io/Briefing-Diario/cover.jpg"/>
+    <itunes:category text="News"><itunes:category text="Business News"/></itunes:category>
+    <itunes:explicit>false</itunes:explicit>
+    <itunes:type>episodic</itunes:type>
+    <itunes:block>Yes</itunes:block>
+    <item>
+      <title>Briefing del miércoles 28 de octubre de 2026</title>
+      <description>Hoy te cuento cuatro cosas. Un choque de trenes de alta velocidad en Toledo deja al menos sesenta y ocho muertos, y el Gobierno apunta a un error en el centro de control. Israel sin mayoría y Washington preparando nuevos ataques contra Irán mantienen la energía por las nubes. La Fed decide esta tarde, pero todos esperan a Warsh y a las tecnológicas. Y en los mercados, el Ibex cae con fuerza.</description>
+      <guid isPermaLink="false">briefing-2026-10-28-1738</guid>
+      <pubDate>Wed, 28 Oct 2026 17:38:26 +0100</pubDate>
+      <enclosure url="https://ignacio052003.github.io/Briefing-Diario/briefing-2026-10-28-1738.mp3" length="3206523" type="audio/mpeg"/>
+      <itunes:duration>4:27</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:episodeType>full</itunes:episodeType>
+    </item>
+    <item>
+      <title>Briefing del martes 27 de octubre de 2026</title>
+      <description>Israel ha votado y no ha salido un ganador claro. Brasil sigue digiriendo el terremoto financiero de la victoria de Lula. Y la inteligencia artificial vuelve a mandar en Wall Street, justo la víspera de que hable la Reserva Federal.</description>
+      <guid isPermaLink="false">briefing-2026-10-27</guid>
+      <pubDate>Tue, 27 Oct 2026 21:06:43 +0100</pubDate>
+      <enclosure url="https://ignacio052003.github.io/Briefing-Diario/briefing-2026-10-27.mp3" length="5334040" type="audio/mpeg"/>
+      <itunes:duration>7:24</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+      <itunes:episodeType>full</itunes:episodeType>
+    </item>
+  </channel>
+</rss>
