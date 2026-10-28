@@ -20,11 +20,13 @@ TEXTO = (
 
 async def main(salida: Path, velocidad: str) -> None:
     salida.mkdir(parents=True, exist_ok=True)
-    voces = [v for v in await edge_tts.list_voices() if v["Locale"] == "es-ES"]
+    # Voces de España y voces "multilingües" (más expresivas; pueden leer en español)
+    voces = [v for v in await edge_tts.list_voices()
+             if v["Locale"] == "es-ES" or "Multilingual" in v["ShortName"]]
     print("Voces de España disponibles:", ", ".join(v["ShortName"] for v in voces))
     for v in voces:
         nombre = v["ShortName"]
-        destino = salida / f"{nombre.removeprefix('es-ES-').removesuffix('Neural')}_{v['Gender']}.mp3"
+        destino = salida / f"{nombre.removesuffix('Neural')}_{v['Gender']}.mp3"
         try:
             await edge_tts.Communicate(TEXTO, nombre, rate=velocidad).save(str(destino))
             print("OK", destino.name)
