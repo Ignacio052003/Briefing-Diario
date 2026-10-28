@@ -37,7 +37,7 @@ def main() -> None:
     site = Path(args.site)
     site.mkdir(parents=True, exist_ok=True)
 
-    if args.solo_si_falta and feed.existe_episodio(site, f"briefing-{ahora:%Y-%m-%d}"):
+    if args.solo_si_falta and feed.existe_episodio(site, f"{ahora:%Y-%m-%d}"):
         print("El episodio de hoy ya existe: no se genera otro.")
         return
 
@@ -61,7 +61,7 @@ def main() -> None:
         print("\n" + texto)
         return
 
-    mp3 = site / f"briefing-{ahora:%Y-%m-%d}.mp3"
+    mp3 = site / f"briefing-{ahora:%Y-%m-%d-%H%M}.mp3"
     if args.demo:
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "lavfi", "-i",
                         "sine=frequency=440:duration=5", "-ac", "1", "-b:a", "64k", str(mp3)], check=True)

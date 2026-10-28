@@ -12,16 +12,32 @@ def _cargar(site: Path) -> list[dict]:
     return json.loads(ruta.read_text(encoding="utf-8")) if ruta.exists() else []
 
 
-def existe_episodio(site: Path, guid: str) -> bool:
-    return any(e["guid"] == guid and (site / e["archivo"]).exists() for e in _cargar(site))
+def _fecha(e: dict) -> str:
+    return e.get("fecha") or e["guid"].removeprefix("briefing-")[:10]
+
+
+def existe_episodio(site: Path, fecha: str) -> bool:
+    """¿Hay ya un episodio publicado de ese día (AAAA-MM-DD)?"""
+    return any(_fecha(e) == fecha and (site / e["archivo"]).exists() for e in _cargar(site))
+
+
+def _borrar(site: Path, e: dict) -> None:
+    (site / e["archivo"]).unlink(missing_ok=True)
+    (site / e["archivo"].replace(".mp3", ".txt")).unlink(missing_ok=True)
 
 
 def añadir_episodio(site: Path, episodio: dict) -> list[dict]:
-    episodios = [e for e in _cargar(site) if e["guid"] != episodio["guid"]]
+    """Añade el episodio; si ya había otro del mismo día, lo sustituye."""
+    episodios = []
+    for e in _cargar(site):
+        if _fecha(e) == episodio["fecha"]:
+            if e["archivo"] != episodio["archivo"]:
+                _borrar(site, e)
+        else:
+            episodios.append(e)
     episodios.insert(0, episodio)
     for viejo in episodios[config.EPISODIOS_A_CONSERVAR:]:
-        (site / viejo["archivo"]).unlink(missing_ok=True)
-        (site / viejo["archivo"].replace(".mp3", ".txt")).unlink(missing_ok=True)
+        _borrar(site, viejo)
     episodios = episodios[:config.EPISODIOS_A_CONSERVAR]
     (site / "episodios.json").write_text(json.dumps(episodios, ensure_ascii=False, indent=1), encoding="utf-8")
     return episodios
@@ -67,7 +83,10 @@ def generar_feed(site: Path, episodios: list[dict], base_url: str) -> None:
 
 def datos_episodio(ahora, archivo: Path, duracion: int, titulo: str, descripcion: str) -> dict:
     return {
-        "guid": f"briefing-{ahora:%Y-%m-%d}",
+        # Cada versión lleva su hora: así la app de Podcasts detecta como nuevo
+        # un episodio regenerado el mismo día.
+        "guid": f"briefing-{ahora:%Y-%m-%d-%H%M}",
+        "fecha": f"{ahora:%Y-%m-%d}",
         "titulo": titulo,
         "descripcion": descripcion,
         "archivo": archivo.name,

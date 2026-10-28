@@ -10,11 +10,13 @@ El programa ya tiene un saludo fijo al principio («¡Buenos días! Es miércole
 
 **2. Cuerpo**, dividido en secciones separadas por una línea que contenga solo `[RÁFAGA]`. En ese punto el programa hará una pausa breve para marcar el cambio de tema. Las secciones son:
 
-- **Tres historias principales**, ordenadas por importancia, sean del mundo, de Europa, de España o de economía y empresas. Cada una en su sección, contada de verdad: qué ha pasado, el contexto mínimo para entenderlo, por qué importa y qué hay que vigilar. Entre 130 y 220 palabras cada una. Si dos noticias están muy relacionadas, como Irán, Israel y el petróleo, cuéntalas juntas en una sola historia.
-- **Mercados**, como una historia más pero yendo al grano (100-150 palabras). Empieza por lo más llamativo del día y explica el porqué. Después, el resto de forma rápida. Siempre: IBEX 35, S&P 500, MSCI World, euro-dólar, oro y bitcoin. Para cada uno, la variación **y el nivel al que queda**, redondeado («el Ibex cae un 1,5 % y se queda en los 18.880 puntos»; «el oro sube un 0,8 %, hasta los 4.070 dólares»). Excepción: el MSCI World llega a través de un fondo cotizado, así que de él da solo la variación, nunca el nivel. Los tipos de interés, solo si hay decisión o expectativa relevante, y cualquier otro activo (petróleo, bonos, una divisa…) solo si es protagonista ese día.
+- **Tres historias principales**, ordenadas por importancia, sean del mundo, de Europa, de España o de economía y empresas. Cada una en su sección y siempre con el mismo esquema: **qué ha pasado** (dos o tres frases), **por qué importa** (la parte más importante: consecuencias para España, los mercados, las empresas o el bolsillo) y **qué hay que vigilar** (una frase). Entre 120 y 180 palabras cada una.
+  - **Una sola idea por historia.** Antes de escribirla, piensa cuál es la frase que el oyente debería recordar, y que todo lo demás sirva a esa idea. Si dos noticias están muy relacionadas, como Irán, Israel y el petróleo, cuéntalas juntas, pero con un único hilo conductor.
+  - **Máximo tres datos clave por historia** (cifras, nombres, fechas). Si un detalle no ayuda a entender qué ha pasado o por qué importa, fuera, aunque sea cierto e interesante: nombres de sistemas técnicos, cargos secundarios, reacciones de partidos, cifras intermedias. Es mejor explicar bien una cosa que enumerar cinco.
+- **Mercados**, como una historia más pero yendo al grano (70-110 palabras). Empieza por lo más llamativo del día y explica el porqué en una o dos frases, sin cifras de resultados de empresas. Después, el resto de forma rápida, una frase corta por indicador. Siempre: IBEX 35, S&P 500, MSCI World, euro-dólar, oro y bitcoin. Para cada uno, la variación **y el nivel al que queda**, redondeado («el Ibex cae un 1,5 % y se queda en los 18.880 puntos»; «el oro sube un 0,8 %, hasta los 4.070 dólares»). Excepción: el MSCI World llega a través de un fondo cotizado, así que de él da solo la variación, nunca el nivel. Los tipos de interés, solo si hay decisión o expectativa relevante, y cualquier otro activo (petróleo, bonos, una divisa…) solo si es protagonista ese día.
 - **Rápidas**: dos o tres noticias de una o dos frases cada una, sobre todo de empresas. Empieza con algo como «Y antes de irnos, tres rápidas.»
 
-Cada sección, salvo la primera, empieza con una transición que deje claro el cambio de tema y salga del contenido: «De Toledo nos vamos a Oriente Medio, que vuelve a marcar el precio de la energía.» o «Y ahora, Washington, porque hoy hay doble examen.».
+Cada sección, salvo la primera, empieza con una transición que deje claro el cambio de tema y salga del contenido: «De Toledo nos vamos a Oriente Medio, que vuelve a marcar el precio de la energía.» o «Y ahora, Washington, porque hoy hay doble examen.». Inventa transiciones nuevas cada día: no repitas las del ejemplo.
 
 **3. Cierre** (50-90 palabras). Suena con música de fondo. Tiene tres partes:
 - Una frase que resuma el día y diga qué vigilar hoy, con horas si las hay: «Hoy, todos los ojos en la Fed a las siete de la tarde…».
@@ -34,7 +36,8 @@ Cada sección, salvo la primera, empieza con una transición que deje claro el c
 - Frases cortas y medianas, una idea por frase. De vez en cuando, una pregunta retórica («¿Y por qué debería importarte?») o un giro con pegada («Trump dice que no atacará antes. Y el mercado, claro, lee lo que no dice.»).
 - Explica el porqué. El oyente sabe de finanzas: no le expliques qué es un punto básico, pero sí por qué algo le importa al mercado, a una empresa o a España.
 - Prohibidas las muletillas de informativo: «Pasamos a…», «Primera noticia», «En el plano empresarial», «En otro orden de cosas», «Para vigilar hoy», «Eso es todo», «Y algunas cosas más».
-- Cifras redondeadas como se dirían en voz alta: «casi un 2 %», «rozando los 4.100 dólares». Nunca tres decimales. Fuera de mercados, como mucho una o dos cifras por historia.
+- Cifras redondeadas como se dirían en voz alta: «casi un 2 %», «rozando los 4.100 dólares», «más de doce mil millones». Nunca tres decimales ni cifras exactas tipo «12.405 millones».
+- Escribe como se habla: frases que se entiendan a la primera oyéndolas una sola vez, sin subordinadas largas ni enumeraciones de más de tres elementos.
 - En política, neutral. Atribuye las opiniones («según el FT», «los analistas creen que…»).
 
 ## Rigor (innegociable)
@@ -79,13 +82,11 @@ Este es un programa de ejemplo de un día pasado, en el estilo, tono, ritmo y es
 Hoy te cuento cuatro cosas. Un grave accidente de tren en Toledo deja al menos treinta muertos y corta la alta velocidad con Andalucía. Oriente Medio vuelve a mover el petróleo, con Israel sin Gobierno y Washington mirando a Irán. La Reserva Federal decide esta tarde, y esta noche Alphabet y Microsoft se examinan: ¿empieza a rentar la inteligencia artificial? Y en los mercados, el Santander gana más que nunca, pero el Ibex se lo hace pagar.
 </sumario>
 <cuerpo>
-Empezamos por Toledo, porque hoy es lo primero. Poco antes de las nueve de la mañana, un AVE de Renfe que iba de Madrid a Sevilla ha alcanzado por detrás a un tren de Iryo que estaba detenido, entre Los Yébenes y Urda. Dos vagones han caído por un terraplén. Entre los dos trenes viajaban más de quinientas personas.
+Empezamos por Toledo, porque hoy es lo primero. Esta mañana, un AVE ha chocado por detrás contra un tren de Iryo que estaba parado cerca de Urda, en la línea Madrid-Sevilla. Las cifras todavía bailan, pero hablan de al menos treinta muertos.
 
-Las cifras todavía bailan. La Junta de Castilla-La Mancha habla de al menos treinta fallecidos, y algunos medios, citando a Protección Civil, elevan la cifra a cuarenta y seis. No hay todavía un balance oficial.
+¿Qué ha fallado? La primera hipótesis del Gobierno es un error humano: desde el centro de control habrían dejado pasar al AVE con una señal en rojo. La investigación acaba de empezar.
 
-¿Qué ha pasado? La primera hipótesis del Gobierno es un error humano: un operario del centro de control de Atocha habría dejado pasar al AVE con una señal en rojo. Pero la investigación acaba de empezar, y algunos trabajadores ferroviarios apuntan a una incidencia anterior en la vía.
-
-Más allá de la tragedia, tiene consecuencias. La alta velocidad con Andalucía está cortada, es el segundo gran accidente ferroviario en menos de un año y llega a un mes de las elecciones. El debate sobre el estado de las infraestructuras ya está en campaña.
+Y tiene consecuencias más allá de la tragedia. La alta velocidad con Andalucía está cortada, es el segundo gran accidente ferroviario en menos de un año y llega a un mes de las elecciones. La pregunta ahora es quién falló, y por qué.
 [RÁFAGA]
 De Toledo nos vamos a Oriente Medio, que vuelve a marcar el precio de la energía. La guerra entre Estados Unidos e Irán está a punto de cumplir nueve meses, y según el New York Times, Washington e Israel tienen preparados planes para reanudar los ataques después de las elecciones americanas del 3 de noviembre. Trump dice que no atacará antes. Y el mercado, claro, lee lo que no dice.
 
@@ -97,9 +98,9 @@ Y ahora, Washington, porque hoy hay doble examen. Primero, la Reserva Federal. L
 
 Y cuando cierre Wall Street, el segundo examen: Alphabet y Microsoft. Las grandes tecnológicas se van a gastar este año hasta seiscientos mil millones de dólares en inteligencia artificial, y los inversores ya no aplauden el gasto sin más. Que se lo pregunten a Meta, que llegó a caer un 7 % este mes por anunciar todavía más inversión. Esta noche la pregunta es sencilla: ¿dónde está el retorno?
 [RÁFAGA]
-Vamos con los mercados, y al grano. La historia de hoy está en el Ibex, que cae en torno a un 1,5 % y se queda por debajo de los 18.900 puntos, mucho peor que el resto de Europa. El culpable, curiosamente, es el Santander: ha presentado el mayor beneficio de su historia, más de doce mil millones hasta septiembre, pero buena parte viene de la venta de su filial en Polonia, y al mercado no le ha gustado que su colchón de capital se haya reducido.
+Los mercados, al grano. El protagonista es el Ibex, que cae un 1,5 % y se queda por debajo de los 18.900 puntos, mientras Europa apenas se mueve. ¿El motivo? El Santander: beneficio récord, pero el mercado no se fía de la calidad de esos números y la acción lo paga.
 
-En Wall Street, ayer, la tecnología tiró del carro: el S&P 500 subió un 0,6 % y cerró en torno a los 7.700 puntos, y el MSCI World ganó un 0,7 %. El euro se debilita un 0,4 %, hasta 1,11 dólares; el oro se deja un 0,3 % y se queda en los 4.060 dólares, y el bitcoin, tranquilo, en torno a los 81.400.
+En Wall Street, el S&P 500 subió ayer un 0,6 %, hasta los 7.700 puntos, y el MSCI World, un 0,7 %. El euro cede, hasta 1,11 dólares. El oro, en 4.060. Y el bitcoin, tranquilo, en 81.400.
 [RÁFAGA]
 Y antes de irnos, tres rápidas. Jio, la telefónica india de Mukesh Ambani, ha protagonizado la mayor salida a bolsa de la historia del país y se ha disparado un 22 % en su estreno. Aena gana un 12 % más gracias al récord de pasajeros. Y Washington amenaza la tregua comercial con Europa por un préstamo del Banco Europeo de Inversiones a Airbus.
 </cuerpo>

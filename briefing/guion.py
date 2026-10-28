@@ -38,6 +38,41 @@ def separar(texto: str) -> dict:
     return {"sumario": sumario, "secciones": secciones, "cierre": cierre or CIERRE_POR_DEFECTO}
 
 
+def _a_texto(guion: dict) -> str:
+    cuerpo = "\n[RÁFAGA]\n".join(guion["secciones"])
+    return (f"<sumario>\n{guion['sumario']}\n</sumario>\n<cuerpo>\n{cuerpo}\n</cuerpo>\n"
+            f"<cierre>\n{guion['cierre']}\n</cierre>")
+
+
+def _palabras(guion: dict) -> int:
+    return sum(len(t.split()) for t in [guion["sumario"], guion["cierre"], *guion["secciones"]])
+
+
+def revisar(cliente, borrador: dict) -> dict:
+    """Segunda pasada: un 'editor' recorta datos y hace el texto más hablado.
+    Si algo sale raro, se queda el borrador original."""
+    plantilla = (Path(__file__).parent.parent / "prompts" / "editor.md").read_text(encoding="utf-8")
+    sistema = plantilla.replace("{palabras_min}", str(config.PALABRAS_OBJETIVO[0])) \
+                       .replace("{palabras_max}", str(config.PALABRAS_OBJETIVO[1]))
+    try:
+        resp = cliente.messages.create(
+            model=config.MODELO_IA, max_tokens=8000, system=sistema,
+            messages=[{"role": "user", "content": "Este es el guion de hoy:\n\n" + _a_texto(borrador)}],
+        )
+        revisado = separar("".join(b.text for b in resp.content if b.type == "text"))
+    except Exception as e:  # noqa: BLE001
+        print(f"La revisión del editor ha fallado ({e}); se usa el borrador.")
+        return borrador
+    antes, despues = _palabras(borrador), _palabras(revisado)
+    print(f"Editor: {antes} → {despues} palabras, {len(revisado['secciones'])} secciones. "
+          f"Tokens: {resp.usage.input_tokens} in / {resp.usage.output_tokens} out")
+    if (len(revisado["secciones"]) < max(3, len(borrador["secciones"]) - 1)
+            or despues < 0.55 * antes or not revisado["sumario"]):
+        print("La versión del editor no pasa los controles; se usa el borrador.")
+        return borrador
+    return revisado
+
+
 def escribir_guion(ahora, noticias: str, mercados: str) -> dict:
     """Devuelve {"saludo", "sumario", "secciones", "cierre"} listos para locutar."""
     plantilla = (Path(__file__).parent.parent / "prompts" / "guion.md").read_text(encoding="utf-8")
@@ -85,11 +120,14 @@ y escribe el sumario, el cuerpo y el cierre siguiendo tus instrucciones."""
 
     texto = "".join(textos)
     guion = separar(texto)
-    palabras = sum(len(t.split()) for t in [guion["sumario"], guion["cierre"], *guion["secciones"]])
-    print(f"Fin de la respuesta: {resp.stop_reason}. Guion: {palabras} palabras, "
+    palabras = _palabras(guion)
+    print(f"Fin de la respuesta: {resp.stop_reason}. Borrador: {palabras} palabras, "
           f"{len(guion['secciones'])} secciones. Tokens: {entrada} in / {salida} out")
     if palabras < 300:
         raise RuntimeError(f"Guion demasiado corto ({palabras} palabras). Respuesta:\n{texto[:2000]}")
+
+    if getattr(config, "REVISION_EDITOR", False):
+        guion = revisar(cliente, guion)
 
     guion["saludo"] = config.SALUDO.format(fecha=fecha_corta(ahora))
     return guion

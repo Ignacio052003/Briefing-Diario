@@ -13,7 +13,8 @@ ZONA_HORARIA = "Europe/Madrid"
 # --- Modelo de IA (Claude) --------------------------------------------------
 MODELO_IA = "claude-sonnet-5-5"     # "claude-opus-5-5" = mejor y algo más caro
 MAX_BUSQUEDAS_WEB = 5               # búsquedas que puede hacer para completar datos (cada una suma coste)
-PALABRAS_OBJETIVO = (950, 1100)     # sumario + cuerpo + cierre: ~6 minutos con música
+PALABRAS_OBJETIVO = (850, 1000)     # sumario + cuerpo + cierre: ~5,5-6 minutos con música
+REVISION_EDITOR = True             # segunda pasada que recorta datos y hace el texto más hablado
 
 # --- Voz ----------------------------------------------------------------------
 # "edge"   -> gratis, voces neuronales de Microsoft (no necesita cuenta)
