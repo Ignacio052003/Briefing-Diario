@@ -12,6 +12,10 @@ def _cargar(site: Path) -> list[dict]:
     return json.loads(ruta.read_text(encoding="utf-8")) if ruta.exists() else []
 
 
+def existe_episodio(site: Path, guid: str) -> bool:
+    return any(e["guid"] == guid and (site / e["archivo"]).exists() for e in _cargar(site))
+
+
 def añadir_episodio(site: Path, episodio: dict) -> list[dict]:
     episodios = [e for e in _cargar(site) if e["guid"] != episodio["guid"]]
     episodios.insert(0, episodio)

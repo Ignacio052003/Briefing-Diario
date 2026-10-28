@@ -14,6 +14,7 @@ def _preparar(texto: str) -> str:
     texto = f" {texto} "
     for original, dicho in config.PRONUNCIACION.items():
         texto = texto.replace(original, dicho)
+    texto = re.sub(r"\[[^\]]*\]", " ", texto)      # acotaciones entre corchetes, p. ej. [RÁFAGA]
     texto = re.sub(r"[*#_`]", "", texto)          # restos de markdown
     return re.sub(r"[ \t]+", " ", texto).strip()
 
@@ -140,17 +141,39 @@ def _silencio(segundos: float, destino: Path) -> Path:
     return destino
 
 
-def mezclar(saludo: Path, cuerpo: Path, cierre: Path, destino: Path, carpeta: Path) -> None:
+def _rafaga(musica: Path, destino: Path) -> Path:
+    """Golpe de música corto entre secciones, sacado de la misma canción."""
+    d = config.RAFAGA_DURACION_SEG
+    _ffmpeg("-ss", str(config.RAFAGA_INICIO_SEG), "-t", str(d), "-i", str(musica),
+            "-af", f"aresample=44100,aformat=channel_layouts=stereo,volume={config.MUSICA_VOLUMEN},"
+                   f"afade=t=in:st=0:d=0.05,afade=t=out:st={d - 0.7}:d=0.7",
+            "-ar", "44100", "-ac", "2", str(destino))
+    return destino
+
+
+def mezclar(entrada_voz: Path, secciones: list[Path], cierre: Path, destino: Path, carpeta: Path) -> None:
     musica = RAIZ / config.MUSICA
-    if musica.exists():
+    hay_musica = musica.exists()
+    if hay_musica:
         entrada, salida = carpeta / "entrada.wav", carpeta / "salida.wav"
-        _con_musica(saludo, musica, entrada, es_entrada=True)
+        _con_musica(entrada_voz, musica, entrada, es_entrada=True)
         _con_musica(cierre, musica, salida, es_entrada=False)
     else:
         print(f"No encuentro {config.MUSICA}: el episodio irá sin música.")
-        entrada, salida = saludo, cierre
-    piezas = [entrada, _silencio(0.4, carpeta / "s1.wav"), cuerpo,
-              _silencio(0.6, carpeta / "s2.wav"), salida]
+        entrada, salida = entrada_voz, cierre
+    if hay_musica and getattr(config, "RAFAGAS", False):
+        separador = [_silencio(0.3, carpeta / "sa.wav"), _rafaga(musica, carpeta / "rafaga.wav"),
+                     _silencio(0.3, carpeta / "sb.wav")]
+    else:
+        separador = [_silencio(0.9, carpeta / "sa.wav")]  # pausa entre noticias
+
+    piezas = [entrada, _silencio(0.4, carpeta / "s1.wav")]
+    for i, seccion in enumerate(secciones):
+        if i:
+            piezas += separador
+        piezas.append(seccion)
+    piezas += [_silencio(0.6, carpeta / "s2.wav"), salida]
+
     unido = carpeta / "unido.wav"
     _a_wav(piezas, unido)
     # Volumen final homogéneo, al nivel habitual de los podcasts
@@ -162,6 +185,15 @@ def locutar(guion: dict, destino: Path) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         carpeta = Path(tmp)
         saludo = _locutar_parte(guion["saludo"], carpeta, "saludo", energica=True)
-        cuerpo = _locutar_parte(guion["cuerpo"], carpeta, "cuerpo", energica=False)
-        cierre = _locutar_parte(guion["cierre"], carpeta, "cierre", energica=True)
-        mezclar(saludo, cuerpo, cierre, destino, carpeta)
+        piezas_entrada = [saludo]
+        if guion.get("sumario"):
+            piezas_entrada += [_silencio(0.5, carpeta / "s0.wav"),
+                               _locutar_parte(guion["sumario"], carpeta, "sumario", energica=False)]
+        entrada = carpeta / "entrada_voz.wav"
+        _a_wav(piezas_entrada, entrada)
+
+        secciones = [_locutar_parte(t, carpeta, f"seccion{i:02}_", energica=False)
+                     for i, t in enumerate(guion["secciones"])]
+        # Cierre con energía solo si el guion la trae (en días de tragedia no lleva exclamaciones)
+        cierre = _locutar_parte(guion["cierre"], carpeta, "cierre", energica="¡" in guion["cierre"])
+        mezclar(entrada, secciones, cierre, destino, carpeta)

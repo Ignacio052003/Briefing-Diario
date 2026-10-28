@@ -13,7 +13,7 @@ ZONA_HORARIA = "Europe/Madrid"
 # --- Modelo de IA (Claude) --------------------------------------------------
 MODELO_IA = "claude-sonnet-5-5"     # "claude-opus-5-5" = mejor y algo más caro
 MAX_BUSQUEDAS_WEB = 5               # búsquedas que puede hacer para completar datos (cada una suma coste)
-PALABRAS_OBJETIVO = (1200, 1350)    # cuerpo de ~7 minutos a +20 %; con saludo, cierre y música, ~8 min
+PALABRAS_OBJETIVO = (950, 1100)     # sumario + cuerpo + cierre: ~6 minutos con música
 
 # --- Voz ----------------------------------------------------------------------
 # "edge"   -> gratis, voces neuronales de Microsoft (no necesita cuenta)
@@ -25,11 +25,14 @@ VELOCIDAD_EDGE_SALUDO = "+24%"     # saludo y cierre, algo más rápidos
 TONO_EDGE_SALUDO = "+6Hz"          # y un poco más agudos, para darles energía
 
 # Saludo fijo (la fecha se rellena sola)
-SALUDO = "¡Buenos días! Hoy es {fecha}. ¡Y este es tu podcast personalizado diario, para que estés al día de todo!"
+SALUDO = "¡Buenos días! Es {fecha}. ¡Este es tu resumen diario, para que estés al día de todo!"
 
 # --- Música -------------------------------------------------------------------
 MUSICA = "assets/musica.mp3"       # si no existe el archivo, el episodio va sin música
 MUSICA_ENTRADA_SEG = 4.0           # segundos de música sola antes del saludo
+RAFAGAS = False                    # True = golpe de música entre noticias; False = solo una pausa
+RAFAGA_INICIO_SEG = 35.0           # de qué segundo de la canción se saca la ráfaga entre secciones
+RAFAGA_DURACION_SEG = 1.6          # duración de la ráfaga
 MUSICA_SALIDA_SEG = 5.0            # segundos de música sola tras la despedida
 MUSICA_VOLUMEN = 0.28              # volumen de la música cuando suena sola
 MUSICA_VOLUMEN_FONDO = 0.07        # volumen de la música por debajo de la voz

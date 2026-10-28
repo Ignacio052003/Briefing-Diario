@@ -5,6 +5,7 @@ Uso:
   python main.py --site site --base-url https://usuario.github.io/repo
   python main.py --solo-guion          # solo imprime el guion (sin audio)
   python main.py --demo --site site    # prueba sin conexión (guion y audio de ejemplo)
+  python main.py --solo-si-falta …     # no hace nada si el episodio de hoy ya existe
 """
 import argparse
 import os
@@ -28,17 +29,24 @@ def main() -> None:
     p.add_argument("--base-url", default=os.environ.get("FEED_BASE_URL", "http://localhost"))
     p.add_argument("--solo-guion", action="store_true")
     p.add_argument("--demo", action="store_true")
+    p.add_argument("--solo-si-falta", action="store_true",
+                   help="no generar nada si el episodio de hoy ya está publicado")
     args = p.parse_args()
 
     ahora = datetime.now(ZoneInfo(config.ZONA_HORARIA))
     site = Path(args.site)
     site.mkdir(parents=True, exist_ok=True)
 
+    if args.solo_si_falta and feed.existe_episodio(site, f"briefing-{ahora:%Y-%m-%d}"):
+        print("El episodio de hoy ya existe: no se genera otro.")
+        return
+
     if args.demo:
         from briefing.guion import fecha_corta
         guion = {"saludo": config.SALUDO.format(fecha=fecha_corta(ahora)),
-                 "cuerpo": "Esto es una prueba del briefing. Los mercados abren con calma.",
-                 "cierre": "¡Aquí tienes tu resumen! ¡Y al ataque!"}
+                 "sumario": "Hoy te cuento dos cosas: una prueba y otra prueba.",
+                 "secciones": ["Primera sección de prueba.", "Segunda sección de prueba."],
+                 "cierre": "¡Y hasta aquí tu resumen! ¡Y al ataque!"}
     else:
         from briefing.fuentes import recoger_mercados, recoger_noticias
         from briefing.guion import escribir_guion
@@ -47,7 +55,8 @@ def main() -> None:
         print("Redactando el guion con Claude…")
         guion = escribir_guion(ahora, noticias, mercados)
 
-    texto = "\n\n".join([guion["saludo"], guion["cuerpo"], guion["cierre"]])
+    texto = "\n\n".join([guion["saludo"], guion["sumario"],
+                         "\n\n[RÁFAGA]\n\n".join(guion["secciones"]), guion["cierre"]])
     if args.solo_guion:
         print("\n" + texto)
         return
@@ -65,8 +74,8 @@ def main() -> None:
     duracion = int(duracion_segundos(mp3))
     mp3.with_suffix(".txt").write_text(texto, encoding="utf-8")
 
-    frases = re.split(r"(?<=[.!?])\s+", guion["cuerpo"].replace("\n", " "))
-    descripcion = " ".join(frases[:3])[:600]
+    descripcion = guion["sumario"][:600] or " ".join(
+        re.split(r"(?<=[.!?])\s+", guion["secciones"][0].replace("\n", " "))[:3])[:600]
     titulo = f"Briefing del {fecha_larga(ahora)}"
     episodios = feed.añadir_episodio(site, feed.datos_episodio(ahora, mp3, duracion, titulo, descripcion))
 
